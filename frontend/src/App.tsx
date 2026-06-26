@@ -1,5 +1,8 @@
 import "./App.css";
 
+import { useEffect, useState } from "react";
+import { API_BASE_URL } from "./config";
+import type { ApiStatusResponse } from "./types/service";
 import { Sidebar } from "./components/Sidebar";
 import { Topbar } from "./components/Topbar";
 import { ServiceCard } from "./components/ServiceCard";
@@ -9,6 +12,26 @@ import { StatusDot } from "./components/StatusDot";
 import { network, services, summaryItems } from "./data/mockData";
 
 function App() {
+  const [apiData, setApiData] = useState<ApiStatusResponse | null>(null);
+
+useEffect(() => {
+  fetch(`${API_BASE_URL}/api/status`)
+    .then((res) => res.json())
+    .then(setApiData)
+    .catch(console.error);
+}, []);
+
+const liveServices = apiData
+  ? apiData.services.map((apiService) => {
+      const mockService = services.find((s) => s.name === apiService.name);
+
+      return {
+        ...apiService,
+        icon: mockService?.icon ?? services[0].icon,
+      };
+    })
+  : services;
+
   return (
     <div className="app">
       <Sidebar />
@@ -31,8 +54,8 @@ function App() {
         </section>
 
         <section className="cards-grid">
-          {services.map((service) => (
-            <ServiceCard key={service.name} service={service} />
+          {liveServices.map((service) => (
+          <ServiceCard key={service.name} service={service} />
           ))}
         </section>
 
