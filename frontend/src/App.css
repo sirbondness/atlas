@@ -371,3 +371,57 @@ h1 {
     flex-direction: column;
   }
 }
+
+.topbar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: flex-end;
+}
+
+.clock-card {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 18px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #e5e7eb;
+  min-width: 220px;
+}
+
+.clock-card svg {
+  color: #22d3ee;
+}
+
+.clock-card strong {
+  display: block;
+  font-size: 18px;
+}
+
+.clock-card span {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.card,
+.summary-card,
+.panel,
+.clock-card,
+.overall {
+  backdrop-filter: blur(18px);
+}
+
+.card,
+.summary-card,
+.panel {
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.card:hover,
+.summary-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(34, 211, 238, 0.35);
+  background: rgba(15, 23, 42, 0.95);
+}
