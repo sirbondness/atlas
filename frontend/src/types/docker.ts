@@ -3,6 +3,10 @@ export type DockerContainer = {
   image: string;
   status: string;
   health: string | null;
+  created: string | null;
+  restart_count: number;
+  ports: string[];
+  networks: string[];
 };
 
 export type DockerStatus = {
@@ -10,5 +14,6 @@ export type DockerStatus = {
   error?: string;
   running: number;
   stopped: number;
+  images: number;
   containers: DockerContainer[];
 };
