@@ -15,7 +15,7 @@ function App() {
   const [apiData, setApiData] = useState<ApiStatusResponse | null>(null);
 
 useEffect(() => {
-  fetch(`${API_BASE_URL}/api/status`)
+  fetch(`${API_BASE_URL}/api/v1/status`)
     .then((res) => res.json())
     .then(setApiData)
     .catch(console.error);

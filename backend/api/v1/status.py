@@ -6,7 +6,7 @@ from models.status import StatusResponse
 from modules.health import calculate_overall_status
 from modules.http_checks import check_http_service
 
-router = APIRouter(prefix="/api", tags=["status"])
+router = APIRouter(prefix="/api/v1", tags=["status"])
 
 
 @router.get("/status", response_model=StatusResponse)

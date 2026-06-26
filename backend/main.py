@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers.status import router as status_router
-from modules.docker import get_docker_status
+from api.v1.status import router as status_router
+from api.v1.docker import router as docker_router
 
 app = FastAPI(title="Atlas API", version="0.1.0")
 
@@ -15,12 +15,13 @@ app.add_middleware(
 )
 
 app.include_router(status_router)
+app.include_router(docker_router)
 
 
 @app.get("/")
 async def root():
-    return {"name": "Atlas API", "status": "running"}
-
-@app.get("/docker")
-async def docker():
-    return get_docker_status()
+    return {
+        "name": "Atlas API",
+        "status": "running",
+        "version": "0.1.0",
+    }
