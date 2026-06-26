@@ -10,6 +10,7 @@ import { SummaryCard } from "./components/SummaryCard";
 import { StatusDot } from "./components/StatusDot";
 
 import { network, services, summaryItems } from "./data/mockData";
+import type { DockerStatus } from "./types/docker";
 
 function App() {
   const [apiData, setApiData] = useState<ApiStatusResponse | null>(null);
@@ -18,6 +19,15 @@ useEffect(() => {
   fetch(`${API_BASE_URL}/api/v1/status`)
     .then((res) => res.json())
     .then(setApiData)
+    .catch(console.error);
+}, []);
+
+const [dockerData, setDockerData] = useState<DockerStatus | null>(null);
+
+useEffect(() => {
+  fetch(`${API_BASE_URL}/api/v1/docker`)
+    .then((res) => res.json())
+    .then(setDockerData)
     .catch(console.error);
 }, []);
 
@@ -78,6 +88,44 @@ const liveServices = apiData
               ))}
             </div>
           </div>
+
+<div className="panel">
+  <div className="panel-header">
+    <h2>Docker Engine</h2>
+    <p>Container runtime overview.</p>
+  </div>
+
+  {dockerData ? (
+    <>
+      <div className="docker-stats">
+        <div>
+          <span>Running</span>
+          <strong>{dockerData.running}</strong>
+        </div>
+        <div>
+          <span>Stopped</span>
+          <strong>{dockerData.stopped}</strong>
+        </div>
+      </div>
+
+      <div className="network-list">
+        {dockerData.containers.map((container) => (
+          <div className="network-row" key={container.name}>
+            <div>
+              <strong>{container.name}</strong>
+              <span>{container.image}</span>
+            </div>
+            <span className={container.status === "running" ? "status status-healthy" : "status status-offline"}>
+              ● {container.status}
+            </span>
+          </div>
+        ))}
+      </div>
+    </>
+  ) : (
+    <p>Loading Docker data...</p>
+  )}
+</div>
 
           <div className="panel">
             <div className="panel-header">
