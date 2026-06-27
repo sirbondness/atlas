@@ -1,7 +1,11 @@
 import type { DockerStatus } from "../../types/docker";
 import { Card, CardBody, CardHeader } from "../UI/Card";
 import type { DockerMetrics } from "../../client/atlasClient";
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import {
+  type ContainerFilter,
+  useContainerFilter,
+} from "../../hooks/useContainerFilter";
 
 type DockerCardProps = {
   dockerData: DockerStatus | null;
@@ -11,39 +15,14 @@ type DockerCardProps = {
 export function DockerCard({ dockerData, dockerMetrics }: DockerCardProps) {
   
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<
-  "all" | "running" | "stopped" | "healthy"
-  >("all");
-  const filteredContainers = useMemo(() => {
-  if (!dockerData) return [];
-
-  return dockerData.containers.filter((container) => {
-    const matchesSearch = container.name
-      .toLowerCase()
-      .includes(search.toLowerCase());
-
-    let matchesFilter = true;
-
-    switch (filter) {
-      case "running":
-        matchesFilter = container.status === "running";
-        break;
-
-      case "stopped":
-        matchesFilter = container.status !== "running";
-        break;
-
-      case "healthy":
-        matchesFilter = container.health === "healthy";
-        break;
-
-      default:
-        matchesFilter = true;
-    }
-
-    return matchesSearch && matchesFilter;
+  const [filter, setFilter] = useState<ContainerFilter>("all");
+  
+  const filteredContainers = useContainerFilter({
+    dockerData,
+    search,
+    filter
   });
-}, [dockerData, search, filter]);
+    
   return (
   
   <Card>
@@ -77,7 +56,7 @@ export function DockerCard({ dockerData, dockerMetrics }: DockerCardProps) {
                 type="text"
                 placeholder="🔍 Search containers..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => setSearch(e.target.value as ContainerFilter)}
               />
 
               <select
