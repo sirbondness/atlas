@@ -1,4 +1,5 @@
 export type DockerContainer = {
+  id: string;
   name: string;
   image: string;
   status: string;

@@ -2,6 +2,14 @@ import { API_BASE_URL } from "../config";
 import type { DockerStatus } from "../types/docker";
 import type { ApiStatusResponse } from "../types/service";
 
+export type DockerMetrics = Record<
+  string,
+  {
+    cpu_percent: number;
+    memory_mb: number;
+  }
+>;
+
 async function request<T>(path: string): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`);
 
@@ -19,5 +27,9 @@ export const atlasClient = {
 
   getDocker() {
     return request<DockerStatus>("/api/v1/docker");
+  },
+
+  getDockerMetrics() {
+    return request<DockerMetrics>("/api/v1/docker/metrics");
   },
 };

@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 
-import { atlasClient } from "../client/atlasClient";
+import { atlasClient, type DockerMetrics } from "../client/atlasClient";
 import type { DockerStatus } from "../types/docker";
 import type { ApiStatusResponse } from "../types/service";
 
 type AtlasDataState = {
   statusData: ApiStatusResponse | null;
   dockerData: DockerStatus | null;
+  dockerMetrics: DockerMetrics | null;
   lastUpdated: Date | null;
   isLoading: boolean;
   error: string | null;
@@ -16,6 +17,7 @@ export function useAtlasData() {
   const [state, setState] = useState<AtlasDataState>({
     statusData: null,
     dockerData: null,
+    dockerMetrics: null,
     lastUpdated: null,
     isLoading: true,
     error: null,
@@ -23,14 +25,16 @@ export function useAtlasData() {
 
   async function refresh() {
     try {
-      const [statusData, dockerData] = await Promise.all([
+      const [statusData, dockerData, dockerMetrics] = await Promise.all([
         atlasClient.getStatus(),
         atlasClient.getDocker(),
+        atlasClient.getDockerMetrics(),
       ]);
 
       setState({
         statusData,
         dockerData,
+        dockerMetrics,
         lastUpdated: new Date(),
         isLoading: false,
         error: null,

@@ -1,11 +1,13 @@
 import type { DockerStatus } from "../../types/docker";
 import { Card, CardBody, CardHeader } from "../UI/Card";
+import type { DockerMetrics } from "../../client/atlasClient";
 
 type DockerCardProps = {
   dockerData: DockerStatus | null;
+  dockerMetrics: DockerMetrics | null;
 };
 
-export function DockerCard({ dockerData }: DockerCardProps) {
+export function DockerCard({ dockerData, dockerMetrics }: DockerCardProps) {
   return (
   <Card>
     <CardHeader
@@ -34,7 +36,10 @@ export function DockerCard({ dockerData }: DockerCardProps) {
           </div>
 
           <div className="container-list">
-            {dockerData.containers.map((container) => (
+            {dockerData.containers.map((container) => {
+            const metrics = dockerMetrics?.[container.id];
+
+            return (
               <div className="container-row" key={container.name}>
                 <div className="container-main">
                   <div>
@@ -56,11 +61,11 @@ export function DockerCard({ dockerData }: DockerCardProps) {
                 <div className="container-metrics">
                     <div>
                         <span>CPU</span>
-                        <strong>{container.cpu_percent}%</strong>
+                        <strong>{metrics?.cpu_percent ?? 0}%</strong>
                     </div>
                 <div>
                     <span>Memory</span>
-                    <strong>{container.memory_mb} MB</strong>
+                    <strong>{metrics?.memory_mb ?? 0} MB</strong>
                 </div>
                 <div>
                 <span>Uptime</span>
@@ -82,10 +87,11 @@ export function DockerCard({ dockerData }: DockerCardProps) {
                   </div>
                 )}
               </div>
-            ))}
+        );
+      })}
           </div>
         </>
-      ) : (
+      ) :(
         <p>Loading Docker data...</p>
       )}
     </CardBody>

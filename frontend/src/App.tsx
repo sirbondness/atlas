@@ -12,7 +12,12 @@ import { network, services, summaryItems } from "./data/mockData";
 import { useAtlasData } from "./hooks/useAtlasData";
 
 function App() {
-  const { statusData: apiData, dockerData, lastUpdated } = useAtlasData();
+  const {
+  statusData: apiData,
+  dockerData,
+  dockerMetrics,
+  lastUpdated,
+} = useAtlasData();
 
   const healthScore = dockerData?.healthy === false ? 85 : 98;
 
@@ -92,7 +97,7 @@ function App() {
             </div>
           </div>
 
-          <DockerCard dockerData={dockerData} />
+          <DockerCard dockerData={dockerData} dockerMetrics={dockerMetrics} />
         </section>
       </main>
     </div>
