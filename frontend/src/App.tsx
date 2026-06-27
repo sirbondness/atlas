@@ -1,29 +1,31 @@
 import "./App.css";
+
 import { Sidebar } from "./components/Sidebar";
 import { Topbar } from "./components/Topbar";
 import { ServiceCard } from "./components/ServiceCard";
 import { SummaryCard } from "./components/SummaryCard";
 import { StatusDot } from "./components/StatusDot";
-import { useAtlasData } from "./hooks/useAtlasData";
+import { HealthCard } from "./components/Health/HealthCard";
+import { DockerCard } from "./components/Docker/DockerCard";
+
 import { network, services, summaryItems } from "./data/mockData";
-
-
+import { useAtlasData } from "./hooks/useAtlasData";
 
 function App() {
   const { statusData: apiData, dockerData, lastUpdated } = useAtlasData();
 
   const healthScore = dockerData?.healthy === false ? 85 : 98;
 
-const liveServices = apiData
-  ? apiData.services.map((apiService) => {
-      const mockService = services.find((s) => s.name === apiService.name);
+  const liveServices = apiData
+    ? apiData.services.map((apiService) => {
+        const mockService = services.find((s) => s.name === apiService.name);
 
-      return {
-        ...apiService,
-        icon: mockService?.icon ?? services[0].icon,
-      };
-    })
-  : services;
+        return {
+          ...apiService,
+          icon: mockService?.icon ?? services[0].icon,
+        };
+      })
+    : services;
 
   return (
     <div className="app">
@@ -32,23 +34,7 @@ const liveServices = apiData
       <main className="main">
         <Topbar />
 
-        <section className="health-card">
-          <div>
-            <span>Infrastructure Score</span>
-            <strong>{healthScore}%</strong>
-          </div>
-
-          <div className="health-bar">
-            <div style={{ width: `${healthScore}%` }} />
-          </div>
-
-        <p>
-          Last updated:{" "}
-          {lastUpdated
-          ? lastUpdated.toLocaleTimeString("de-CH")
-          : "waiting for data"}
-        </p>
-          </section>
+        <HealthCard healthScore={healthScore} lastUpdated={lastUpdated} />
 
         <section className="summary-grid">
           {summaryItems.map((item) => (
@@ -66,7 +52,7 @@ const liveServices = apiData
 
         <section className="cards-grid">
           {liveServices.map((service) => (
-          <ServiceCard key={service.name} service={service} />
+            <ServiceCard key={service.name} service={service} />
           ))}
         </section>
 
@@ -90,72 +76,6 @@ const liveServices = apiData
             </div>
           </div>
 
-<div className="panel">
-  <div className="panel-header">
-    <h2>Docker Engine</h2>
-    <p>Container runtime overview.</p>
-  </div>
-
-  {dockerData ? (
-    <>
-  <div className="docker-stats">
-    <div>
-      <span>Running</span>
-      <strong>{dockerData.running}</strong>
-    </div>
-    <div>
-      <span>Stopped</span>
-      <strong>{dockerData.stopped}</strong>
-    </div>
-    <div>
-      <span>Images</span>
-      <strong>{dockerData.images}</strong>
-    </div>
-  </div>
-
-  <div className="container-list">
-    {dockerData.containers.map((container) => (
-      <div className="container-row" key={container.name}>
-        <div className="container-main">
-          <div>
-            <strong>{container.name}</strong>
-            <span>{container.image}</span>
-          </div>
-
-          <span
-            className={
-              container.status === "running"
-                ? "status status-healthy"
-                : "status status-offline"
-            }
-          >
-            ● {container.status}
-          </span>
-        </div>
-
-        <div className="container-meta">
-          <span>Created: {container.created || "n/a"}</span>
-          <span>Restarts: {container.restart_count}</span>
-          <span>Networks: {container.networks.join(", ") || "n/a"}</span>
-        </div>
-
-        {container.ports.length > 0 && (
-          <div className="container-ports">
-            {container.ports.map((port) => (
-              <span key={port}>{port}</span>
-            ))}
-          </div>
-        )}
-      </div>
-    ))}
-  </div>
-</>
-) : (
-  <p>Loading Docker data...</p>
-)}
-
-</div>
-
           <div className="panel">
             <div className="panel-header">
               <h2>Vehicle</h2>
@@ -171,6 +91,8 @@ const liveServices = apiData
               </div>
             </div>
           </div>
+
+          <DockerCard dockerData={dockerData} />
         </section>
       </main>
     </div>
