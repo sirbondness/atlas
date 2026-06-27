@@ -1,39 +1,59 @@
 import { useEffect, useState } from "react";
-import { API_BASE_URL } from "../config";
-import type { ApiStatusResponse } from "../types/service";
+
+import { atlasClient } from "../client/atlasClient";
 import type { DockerStatus } from "../types/docker";
+import type { ApiStatusResponse } from "../types/service";
+
+type AtlasDataState = {
+  statusData: ApiStatusResponse | null;
+  dockerData: DockerStatus | null;
+  lastUpdated: Date | null;
+  isLoading: boolean;
+  error: string | null;
+};
 
 export function useAtlasData() {
-  const [statusData, setStatusData] = useState<ApiStatusResponse | null>(null);
-  const [dockerData, setDockerData] = useState<DockerStatus | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [state, setState] = useState<AtlasDataState>({
+    statusData: null,
+    dockerData: null,
+    lastUpdated: null,
+    isLoading: true,
+    error: null,
+  });
 
   async function refresh() {
     try {
-      const [statusResponse, dockerResponse] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/v1/status`),
-        fetch(`${API_BASE_URL}/api/v1/docker`),
+      const [statusData, dockerData] = await Promise.all([
+        atlasClient.getStatus(),
+        atlasClient.getDocker(),
       ]);
 
-      setStatusData(await statusResponse.json());
-      setDockerData(await dockerResponse.json());
-      setLastUpdated(new Date());
+      setState({
+        statusData,
+        dockerData,
+        lastUpdated: new Date(),
+        isLoading: false,
+        error: null,
+      });
     } catch (error) {
-      console.error(error);
+      setState((current) => ({
+        ...current,
+        isLoading: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      }));
     }
   }
 
   useEffect(() => {
     refresh();
-    const interval = setInterval(refresh, 5000);
+
+    const interval = setInterval(refresh, 15000);
 
     return () => clearInterval(interval);
   }, []);
 
   return {
-    statusData,
-    dockerData,
-    lastUpdated,
+    ...state,
     refresh,
   };
 }

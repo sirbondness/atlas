@@ -5,12 +5,12 @@ from docker import DockerClient
 from docker.errors import DockerException
 
 
-def _format_created(created_raw: str | None) -> str | None:
-    if not created_raw:
+def _format_age(timestamp: str | None) -> str | None:
+    if not timestamp:
         return None
 
     try:
-        created = datetime.fromisoformat(created_raw.replace("Z", "+00:00"))
+        created = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
         now = datetime.now(timezone.utc)
         delta = now - created
 
@@ -48,6 +48,46 @@ def _get_networks(attrs: dict[str, Any]) -> list[str]:
     return list(networks.keys())
 
 
+def _calculate_cpu_percent(stats: dict[str, Any]) -> float:
+    try:
+        cpu_delta = (
+            stats["cpu_stats"]["cpu_usage"]["total_usage"]
+            - stats["precpu_stats"]["cpu_usage"]["total_usage"]
+        )
+        system_delta = (
+            stats["cpu_stats"]["system_cpu_usage"]
+            - stats["precpu_stats"]["system_cpu_usage"]
+        )
+
+        online_cpus = stats["cpu_stats"].get("online_cpus", 1)
+
+        if system_delta > 0 and cpu_delta > 0:
+            return round((cpu_delta / system_delta) * online_cpus * 100.0, 2)
+
+    except Exception:
+        pass
+
+    return 0.0
+
+
+def _get_memory_mb(stats: dict[str, Any]) -> float:
+    try:
+        usage = stats["memory_stats"].get("usage", 0)
+        return round(usage / 1024 / 1024, 1)
+    except Exception:
+        return 0.0
+
+
+def _get_container_stats(container) -> tuple[float, float]:
+    try:
+        stats = container.stats(stream=False)
+        cpu_percent = _calculate_cpu_percent(stats)
+        memory_mb = _get_memory_mb(stats)
+        return cpu_percent, memory_mb
+    except Exception:
+        return 0.0, 0.0
+
+
 def get_docker_status():
     try:
         client = DockerClient.from_env()
@@ -74,7 +114,14 @@ def get_docker_status():
             health = state.get("Health", {}).get("Status")
             restart_count = attrs.get("RestartCount", 0)
             image = container.image.tags[0] if container.image.tags else "<none>"
-            created = _format_created(attrs.get("Created"))
+            created = _format_age(attrs.get("Created"))
+            started_at = _format_age(state.get("StartedAt"))
+
+            cpu_percent = 0.0
+            memory_mb = 0.0
+
+            if container.status == "running":
+                cpu_percent, memory_mb = _get_container_stats(container)
 
             result["containers"].append(
                 {
@@ -83,7 +130,10 @@ def get_docker_status():
                     "status": container.status,
                     "health": health,
                     "created": created,
+                    "uptime": started_at,
                     "restart_count": restart_count,
+                    "cpu_percent": cpu_percent,
+                    "memory_mb": memory_mb,
                     "ports": _get_ports(attrs),
                     "networks": _get_networks(attrs),
                 }
@@ -105,7 +155,10 @@ def get_docker_status():
                     "status": "running",
                     "health": None,
                     "created": "2d ago",
+                    "uptime": "2d ago",
                     "restart_count": 0,
+                    "cpu_percent": 1.8,
+                    "memory_mb": 248.4,
                     "ports": ["0.0.0.0:2368->2368/tcp"],
                     "networks": ["ghost_default"],
                 },
@@ -115,7 +168,10 @@ def get_docker_status():
                     "status": "running",
                     "health": None,
                     "created": "2d ago",
+                    "uptime": "2d ago",
                     "restart_count": 0,
+                    "cpu_percent": 3.1,
+                    "memory_mb": 512.7,
                     "ports": [],
                     "networks": ["ghost_default"],
                 },
@@ -125,7 +181,10 @@ def get_docker_status():
                     "status": "running",
                     "health": None,
                     "created": "5d ago",
+                    "uptime": "5d ago",
                     "restart_count": 1,
+                    "cpu_percent": 0.4,
+                    "memory_mb": 38.2,
                     "ports": [],
                     "networks": ["host"],
                 },
@@ -135,7 +194,10 @@ def get_docker_status():
                     "status": "exited",
                     "health": None,
                     "created": "14d ago",
+                    "uptime": None,
                     "restart_count": 3,
+                    "cpu_percent": 0.0,
+                    "memory_mb": 0.0,
                     "ports": [],
                     "networks": ["bridge"],
                 },

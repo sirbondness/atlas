@@ -53,11 +53,26 @@ export function DockerCard({ dockerData }: DockerCardProps) {
                   </span>
                 </div>
 
-                <div className="container-meta">
-                  <span>Created: {container.created || "n/a"}</span>
-                  <span>Restarts: {container.restart_count}</span>
-                  <span>Networks: {container.networks.join(", ") || "n/a"}</span>
+                <div className="container-metrics">
+                    <div>
+                        <span>CPU</span>
+                        <strong>{container.cpu_percent}%</strong>
+                    </div>
+                <div>
+                    <span>Memory</span>
+                    <strong>{container.memory_mb} MB</strong>
                 </div>
+                <div>
+                <span>Uptime</span>
+                <strong>{container.uptime || "n/a"}</strong>
+                </div>
+            </div>
+
+            <div className="container-meta">
+                <span>Created: {container.created || "n/a"}</span>
+                <span>Restarts: {container.restart_count}</span>
+                <span>Networks: {container.networks.join(", ") || "n/a"}</span>
+            </div>
 
                 {container.ports.length > 0 && (
                   <div className="container-ports">

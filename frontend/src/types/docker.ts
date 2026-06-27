@@ -4,7 +4,10 @@ export type DockerContainer = {
   status: string;
   health: string | null;
   created: string | null;
+  uptime: string | null;
   restart_count: number;
+  cpu_percent: number;
+  memory_mb: number;
   ports: string[];
   networks: string[];
 };
