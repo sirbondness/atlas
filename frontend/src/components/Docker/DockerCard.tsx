@@ -1,4 +1,5 @@
 import type { DockerStatus } from "../../types/docker";
+import { Card, CardBody, CardHeader } from "../UI/Card";
 
 type DockerCardProps = {
   dockerData: DockerStatus | null;
@@ -6,11 +7,14 @@ type DockerCardProps = {
 
 export function DockerCard({ dockerData }: DockerCardProps) {
   return (
-    <div className="panel">
-      <div className="panel-header">
-        <h2>Docker Engine</h2>
-        <p>Container runtime overview.</p>
-      </div>
+  <Card>
+    <CardHeader
+      title="Docker Engine"
+      description="Container runtime overview."
+      action={dockerData?.healthy ? "Healthy" : "Degraded"}
+    />
+
+    <CardBody>
 
       {dockerData ? (
         <>
@@ -69,6 +73,7 @@ export function DockerCard({ dockerData }: DockerCardProps) {
       ) : (
         <p>Loading Docker data...</p>
       )}
-    </div>
+    </CardBody>
+ </Card>
   );
 }

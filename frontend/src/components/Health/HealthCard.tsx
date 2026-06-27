@@ -1,3 +1,6 @@
+import { Card, CardBody, CardHeader } from "../UI/Card";
+
+
 type HealthCardProps = {
   healthScore: number;
   lastUpdated: Date | null;
@@ -5,11 +8,15 @@ type HealthCardProps = {
 
 export function HealthCard({ healthScore, lastUpdated }: HealthCardProps) {
   return (
-    <section className="health-card">
-      <div>
-        <span>Infrastructure Score</span>
-        <strong>{healthScore}%</strong>
-      </div>
+  <Card className="health-card">
+    <CardHeader
+      title="Infrastructure Score"
+      description="Overall platform health based on monitored services."
+      action={lastUpdated ? lastUpdated.toLocaleTimeString("de-CH") : "waiting"}
+    />
+
+    <CardBody>
+      <strong>{healthScore}%</strong>
 
       <div className="health-bar">
         <div style={{ width: `${healthScore}%` }} />
@@ -21,6 +28,7 @@ export function HealthCard({ healthScore, lastUpdated }: HealthCardProps) {
           ? lastUpdated.toLocaleTimeString("de-CH")
           : "waiting for data"}
       </p>
-    </section>
-  );
+    </CardBody>
+  </Card>
+);
 }
