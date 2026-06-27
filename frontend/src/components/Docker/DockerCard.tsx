@@ -11,14 +11,39 @@ type DockerCardProps = {
 export function DockerCard({ dockerData, dockerMetrics }: DockerCardProps) {
   
   const [search, setSearch] = useState("");
-
+  const [filter, setFilter] = useState<
+  "all" | "running" | "stopped" | "healthy"
+  >("all");
   const filteredContainers = useMemo(() => {
   if (!dockerData) return [];
 
-  return dockerData.containers.filter((container) =>
-    container.name.toLowerCase().includes(search.toLowerCase())
-  );
-}, [dockerData, search]);
+  return dockerData.containers.filter((container) => {
+    const matchesSearch = container.name
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+    let matchesFilter = true;
+
+    switch (filter) {
+      case "running":
+        matchesFilter = container.status === "running";
+        break;
+
+      case "stopped":
+        matchesFilter = container.status !== "running";
+        break;
+
+      case "healthy":
+        matchesFilter = container.health === "healthy";
+        break;
+
+      default:
+        matchesFilter = true;
+    }
+
+    return matchesSearch && matchesFilter;
+  });
+}, [dockerData, search, filter]);
   return (
   
   <Card>
@@ -47,14 +72,32 @@ export function DockerCard({ dockerData, dockerMetrics }: DockerCardProps) {
             </div>
           </div>
 
-            <div className="docker-search">
-            <input
-              type="text"
-              placeholder="🔍 Search containers..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            </div>
+            <div className="docker-toolbar">
+              <input
+                type="text"
+                placeholder="🔍 Search containers..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+
+              <select
+                value={filter}
+                onChange={(e) =>
+                  setFilter(
+                    e.target.value as
+                    | "all"
+                    | "running"
+                    | "stopped"
+                    | "healthy"
+                  )
+                }
+              >
+                <option value="all">All</option>
+                <option value="running">Running</option>
+                <option value="stopped">Stopped</option>
+                <option value="healthy">Healthy</option>
+                </select>
+              </div>
 
           <div className="container-list">
             {filteredContainers.map((container) => {
