@@ -1,6 +1,7 @@
 import type { DockerStatus } from "../../types/docker";
 import { Card, CardBody, CardHeader } from "../UI/Card";
 import type { DockerMetrics } from "../../client/atlasClient";
+import { useMemo, useState } from "react";
 
 type DockerCardProps = {
   dockerData: DockerStatus | null;
@@ -8,7 +9,18 @@ type DockerCardProps = {
 };
 
 export function DockerCard({ dockerData, dockerMetrics }: DockerCardProps) {
+  
+  const [search, setSearch] = useState("");
+
+  const filteredContainers = useMemo(() => {
+  if (!dockerData) return [];
+
+  return dockerData.containers.filter((container) =>
+    container.name.toLowerCase().includes(search.toLowerCase())
+  );
+}, [dockerData, search]);
   return (
+  
   <Card>
     <CardHeader
       title="Docker Engine"
@@ -35,8 +47,17 @@ export function DockerCard({ dockerData, dockerMetrics }: DockerCardProps) {
             </div>
           </div>
 
+            <div className="docker-search">
+            <input
+              type="text"
+              placeholder="🔍 Search containers..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            </div>
+
           <div className="container-list">
-            {dockerData.containers.map((container) => {
+            {filteredContainers.map((container) => {
             const metrics = dockerMetrics?.[container.id];
 
             return (
