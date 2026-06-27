@@ -1,35 +1,18 @@
 import "./App.css";
-
-import { useEffect, useState } from "react";
-import { API_BASE_URL } from "./config";
-import type { ApiStatusResponse } from "./types/service";
 import { Sidebar } from "./components/Sidebar";
 import { Topbar } from "./components/Topbar";
 import { ServiceCard } from "./components/ServiceCard";
 import { SummaryCard } from "./components/SummaryCard";
 import { StatusDot } from "./components/StatusDot";
-
+import { useAtlasData } from "./hooks/useAtlasData";
 import { network, services, summaryItems } from "./data/mockData";
-import type { DockerStatus } from "./types/docker";
+
+
 
 function App() {
-  const [apiData, setApiData] = useState<ApiStatusResponse | null>(null);
+  const { statusData: apiData, dockerData, lastUpdated } = useAtlasData();
 
-useEffect(() => {
-  fetch(`${API_BASE_URL}/api/v1/status`)
-    .then((res) => res.json())
-    .then(setApiData)
-    .catch(console.error);
-}, []);
-
-const [dockerData, setDockerData] = useState<DockerStatus | null>(null);
-
-useEffect(() => {
-  fetch(`${API_BASE_URL}/api/v1/docker`)
-    .then((res) => res.json())
-    .then(setDockerData)
-    .catch(console.error);
-}, []);
+  const healthScore = dockerData?.healthy === false ? 85 : 98;
 
 const liveServices = apiData
   ? apiData.services.map((apiService) => {
@@ -48,6 +31,24 @@ const liveServices = apiData
 
       <main className="main">
         <Topbar />
+
+        <section className="health-card">
+          <div>
+            <span>Infrastructure Score</span>
+            <strong>{healthScore}%</strong>
+          </div>
+
+          <div className="health-bar">
+            <div style={{ width: `${healthScore}%` }} />
+          </div>
+
+        <p>
+          Last updated:{" "}
+          {lastUpdated
+          ? lastUpdated.toLocaleTimeString("de-CH")
+          : "waiting for data"}
+        </p>
+          </section>
 
         <section className="summary-grid">
           {summaryItems.map((item) => (
