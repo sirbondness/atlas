@@ -4,8 +4,9 @@ import type { DockerMetrics } from "../../client/atlasClient";
 import { useState } from "react";
 import {
   type ContainerFilter,
-  useContainerFilter,
-} from "../../hooks/useContainerFilter";
+   type ContainerSort,
+  useContainerQuery,
+} from "../../hooks/useContainerQuery";
 
 type DockerCardProps = {
   dockerData: DockerStatus | null;
@@ -16,11 +17,13 @@ export function DockerCard({ dockerData, dockerMetrics }: DockerCardProps) {
   
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<ContainerFilter>("all");
-  
-  const filteredContainers = useContainerFilter({
+  const [sort, setSort] = useState<ContainerSort>("name-asc");
+  const filteredContainers = useContainerQuery({
     dockerData,
     search,
-    filter
+    filter,
+    sort,
+    dockerMetrics,
   });
     
   return (
@@ -53,30 +56,33 @@ export function DockerCard({ dockerData, dockerMetrics }: DockerCardProps) {
 
             <div className="docker-toolbar">
               <input
-                type="text"
-                placeholder="🔍 Search containers..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value as ContainerFilter)}
-              />
+                  type="text"
+                  placeholder="🔍 Search containers..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
 
               <select
-                value={filter}
-                onChange={(e) =>
-                  setFilter(
-                    e.target.value as
-                    | "all"
-                    | "running"
-                    | "stopped"
-                    | "healthy"
-                  )
-                }
-              >
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value as ContainerFilter)}
+            >
                 <option value="all">All</option>
                 <option value="running">Running</option>
                 <option value="stopped">Stopped</option>
                 <option value="healthy">Healthy</option>
+              </select>
+
+              <select
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value as ContainerSort)}
+          >
+                <option value="name-asc">Name ↑</option>
+                <option value="name-desc">Name ↓</option>
+                <option value="memory">Memory</option>
+                <option value="restart">Restarts</option>
+                <option value="status">Status</option>
                 </select>
-              </div>
+            </div>
 
           <div className="container-list">
             {filteredContainers.map((container) => {
