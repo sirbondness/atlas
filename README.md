@@ -1,35 +1,167 @@
 # Atlas
 
-**Unified Infrastructure Dashboard**
+> **A modern Infrastructure Operations Center for Docker, Proxmox, Cloudflare, Home Assistant, Splunk, network devices, and homelabs.**
 
-Atlas is a modern dashboard for monitoring self-hosted infrastructure, homelab services and connected systems.
+Atlas is an open-source monitoring platform built for infrastructure enthusiasts, homelab operators, and IT professionals who want a single, modern interface to monitor and manage their environment.
 
-## Goals
+> **Status:** 🚧 Active Development (v0.2.0)
 
-- Provide a unified overview of infrastructure health
-- Monitor self-hosted services
-- Integrate with Docker, Proxmox, Cloudflare, Home Assistant and MQTT
-- Offer a clean and modern user interface
-- Keep deployment simple using Docker Compose
+---
 
-## Planned Integrations
+## Features
 
-- Docker
-- Proxmox
-- Cloudflare Tunnel
-- Home Assistant
-- MQTT
-- MikroTik
-- Splunk
-- EV telemetry
+### Available
+
+* 🐳 Docker Monitoring
+
+  * Container overview
+  * Search
+  * Filtering
+  * Sorting
+  * Container detail drawer
+  * Memory metrics
+  * Health status
+
+### Planned
+
+* 🖥️ Proxmox VE
+* ☁️ Cloudflare
+* 🏠 Home Assistant
+* 🚗 Mazda Connected Services
+* 📊 Splunk Enterprise
+* 🌐 MikroTik & UniFi Network Monitoring
+
+---
+
+## Tech Stack
+
+### Frontend
+
+* React
+* TypeScript
+* Vite
+
+### Backend
+
+* FastAPI
+* Docker SDK
+* Python
+
+### Development
+
+* Docker Compose
+* Dev Containers
+* GitHub Projects
+
+---
+
+## Quick Start
+
+Clone the repository:
+
+```bash
+git clone https://github.com/sirbondness/atlas.git
+cd atlas
+```
+
+Start the development environment:
+
+```bash
+docker compose up --build
+```
+
+Frontend:
+
+```text
+http://localhost:5173
+```
+
+Backend API:
+
+```text
+http://localhost:8000
+```
+
+---
 
 ## Project Structure
 
 ```text
 atlas/
+
 ├── frontend/
+│   ├── components/
+│   ├── hooks/
+│   ├── client/
+│   └── types/
+│
 ├── backend/
-├── docker/
+│   ├── api/
+│   ├── services/
+│   ├── models/
+│   └── core/
+│
 ├── docs/
-├── diagrams/
-└── screenshots/
+├── docker/
+└── diagrams/
+```
+
+---
+
+## Roadmap
+
+The complete development roadmap can be found in:
+
+* ROADMAP.md
+
+Project architecture and development guidelines are documented in:
+
+* PROJECT.md
+
+---
+
+## Development Status
+
+Current milestone:
+
+**v0.2.0 – Docker Monitoring**
+
+Upcoming milestone:
+
+**v0.3.0 – Atlas Platform**
+
+* Widget System
+* Global Store
+* Theme Engine
+* WebSocket Support
+* Alert Engine
+* Metrics Cache
+
+---
+
+## Philosophy
+
+Atlas follows a few simple principles:
+
+* Performance before features
+* API-first architecture
+* Reusable UI components
+* Clean separation of concerns
+* Long-term maintainability
+* Incremental releases
+
+> **Build it once. Build it right.**
+
+---
+
+## Contributing
+
+Contributions, ideas, and feedback are always welcome.
+
+Please check the project roadmap before opening new feature requests.
+
+---
+
+## License
+
+MIT License
