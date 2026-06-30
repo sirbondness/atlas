@@ -10,7 +10,7 @@ Atlas is an open-source monitoring platform built for infrastructure enthusiasts
 
 ## Dashboard
 
-![Atlas Dashboard](screenshots/dashboard-overview.png)
+![Atlas Dashboard](screenshots/dashboard_overview.png)
 
 ## Features
 
@@ -27,9 +27,9 @@ Atlas currently includes a modern Docker monitoring dashboard featuring:
 - Detail drawer
 - Health monitoring
 
-![Docker Dashboard](screenshots/docker-dashboard.png)
+![Docker Dashboard](screenshots/docker_dashboard.png)
 
-![Docker Container Details](screenshots/docker-details.png)
+![Docker Container Details](screenshots/docker_details.png)
 
 ### Planned
 
