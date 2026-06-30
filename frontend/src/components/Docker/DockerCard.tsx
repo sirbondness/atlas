@@ -2,6 +2,8 @@ import type { DockerStatus } from "../../types/docker";
 import { Card, CardBody, CardHeader } from "../UI/Card";
 import type { DockerMetrics } from "../../client/atlasClient";
 import { useState } from "react";
+import { DockerDetailsDrawer } from "./DockerDetailsDrawer";
+import type { DockerContainer } from "../../types/docker";
 import {
   type ContainerFilter,
    type ContainerSort,
@@ -25,6 +27,8 @@ export function DockerCard({ dockerData, dockerMetrics }: DockerCardProps) {
     sort,
     dockerMetrics,
   });
+  const [selectedContainer, setSelectedContainer] =
+    useState<DockerContainer | null>(null);
     
   return (
   
@@ -89,7 +93,11 @@ export function DockerCard({ dockerData, dockerMetrics }: DockerCardProps) {
             const metrics = dockerMetrics?.[container.id];
 
             return (
-              <div className="container-row" key={container.name}>
+              <div
+                className="container-row"
+                key={container.name}
+                onClick={() => setSelectedContainer(container)}
+        >
                 <div className="container-main">
                   <div>
                     <strong>{container.name}</strong>
@@ -143,6 +151,11 @@ export function DockerCard({ dockerData, dockerMetrics }: DockerCardProps) {
       ) :(
         <p>Loading Docker data...</p>
       )}
+      <DockerDetailsDrawer
+    container={selectedContainer}
+    metrics={dockerMetrics}
+    onClose={() => setSelectedContainer(null)}
+      />
     </CardBody>
  </Card>
   );
