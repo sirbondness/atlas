@@ -1,5 +1,10 @@
 import type { DockerStatus } from "../../types/docker";
-import { Card, CardBody, CardHeader } from "../UI/Card";
+import {
+  Widget,
+  WidgetHeader,
+  WidgetContent,
+  WidgetToolbar,
+} from "../Widgets";
 import type { DockerMetrics } from "../../client/atlasClient";
 import { useState } from "react";
 import { DockerDetailsDrawer } from "./DockerDetailsDrawer";
@@ -31,15 +36,25 @@ export function DockerCard({ dockerData, dockerMetrics }: DockerCardProps) {
     useState<DockerContainer | null>(null);
     
   return (
-  
-  <Card>
-    <CardHeader
-      title="Docker Engine"
-      description="Container runtime overview."
-      action={dockerData?.healthy ? "Healthy" : "Degraded"}
-    />
 
-    <CardBody>
+<Widget>
+<WidgetHeader
+    title="Docker Engine"
+    description="Container runtime overview."
+    action={
+        <span
+            className={
+                dockerData?.healthy
+                    ? "status status-healthy"
+                    : "status status-offline"
+            }
+        >
+            {dockerData?.healthy ? "Healthy" : "Degraded"}
+        </span>
+    }
+/>
+
+    <WidgetContent>
 
       {dockerData ? (
         <>
@@ -156,7 +171,7 @@ export function DockerCard({ dockerData, dockerMetrics }: DockerCardProps) {
     metrics={dockerMetrics}
     onClose={() => setSelectedContainer(null)}
       />
-    </CardBody>
- </Card>
+    </WidgetContent>
+ </Widget>
   );
 }
